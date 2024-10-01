@@ -1,5 +1,7 @@
 ﻿using System.Text;
 using System.Text.Json;
+using Biblioteka.BLL;
+using Biblioteka.Entities;
 using Biblioteka.PL.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,10 +10,12 @@ namespace Biblioteka.PL.Controllers;
 public class UserController : Controller
 {
     private readonly HttpClient _httpClient;
+    private readonly IUserService _userService;
 
-    public UserController(HttpClient httpClient)
+    public UserController(HttpClient httpClient, IUserService userService)
     {
         _httpClient = httpClient;
+        _userService = userService;
     }
 
     [HttpGet]
@@ -49,6 +53,34 @@ public class UserController : Controller
             return RedirectToAction("Index", "Home");
         }
         ModelState.AddModelError(string.Empty, "Неверный логин или пароль");
+        return View(model);
+    }
+    [HttpGet]
+    public ActionResult AddUser()
+    {
+        return View();
+    }
+    
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<ActionResult> AddUser(RegistorModel model)
+    {
+        if (!ModelState.IsValid) return View(model);
+        var polzak = new Polzak
+        {
+            Username = model.Username,
+            Password = model.Password
+        };
+
+        try
+        {
+            await _userService.AddUserAsync(polzak);
+            return RedirectToAction("Login");
+        }
+        catch (InvalidOperationException ex)
+        {
+            ModelState.AddModelError("", ex.Message);
+        }
         return View(model);
     }
 }
