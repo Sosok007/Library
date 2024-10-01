@@ -6,11 +6,8 @@ public interface IAvtorService
 {
     Task<Guid?> InsertAvtorAsync(Avtor newAuthor);
     Task UpdateAvtorAsync(Guid authorId, Avtor updatedAuthor);
-    
     Task<Avtor?> GetAvtorByIdAsync(Guid id);
-    
     Task DeleteAvtorAsync(Guid authorId);
-   
     Task<IReadOnlyCollection<Avtor>> GetAvtorsAsync(); 
-    
+    Task<IReadOnlyCollection<Avtor>> GetAuthorsByIdsAsync(IEnumerable<Guid> ids);
 }

@@ -1,6 +1,4 @@
 using System.Text;
-using Biblioteka.DependencyConfig;
-using Biblioteka.PL.Controllers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 
@@ -8,9 +6,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews().AddRazorRuntimeCompilation();
-DependencyProvider.RegisterServices(builder.Services);
 
-builder.Services.AddHttpClient();
+builder.Services.AddHttpClient("Base", client => client.BaseAddress = new Uri("http://localhost:5194"));
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>

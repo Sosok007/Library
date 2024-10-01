@@ -14,7 +14,8 @@ public class AvtorRepository : IAvtorRepository
 
     public async Task DeleteAvtorAsync(Guid avtorId)
     {
-        var avtor = await _context.Avtors.FindAsync(avtorId);
+        var avtor = await _context.Avtors
+            .FirstOrDefaultAsync(x => x.Id == avtorId);
         if (avtor == null) return;
 
         _context.Avtors.Remove(avtor);
@@ -23,7 +24,9 @@ public class AvtorRepository : IAvtorRepository
 
     public async Task<Avtor?> GetAvtorByIdAsync(Guid id)
     {
-        return await _context.Avtors.FirstOrDefaultAsync(x => x.Id == id);
+        return await _context.Avtors
+            .Include(x => x.Books)
+            .FirstOrDefaultAsync(x => x.Id == id);
     }
 
     public async Task<Guid?> InsertAvtorAsync(Avtor newAvtor)
@@ -43,10 +46,17 @@ public class AvtorRepository : IAvtorRepository
             avtor.Patronymic = updatedAuthor.Patronymic;
             avtor.Lastname = updatedAuthor.Lastname;
             avtor.Books = updatedAuthor.Books;
+
             _context.Avtors.Update(avtor);
-            await _context.SaveChangesAsync();
         }
     }
 
-    public async Task<IReadOnlyCollection<Avtor>> GetAvtorsAsync() => await _context.Avtors.ToListAsync();
+    public async Task<IReadOnlyCollection<Avtor>> GetAvtorsAsync() => await _context.Avtors
+        .Include(x => x.Books)
+        .ToListAsync();
+    
+    public async Task<IReadOnlyCollection<Avtor>> GetAvtorsByIdsAsync(IEnumerable<Guid> ids)
+    {
+        return await _context.Avtors.Where(x => ids.Contains(x.Id)).ToListAsync();
+    }
 }    

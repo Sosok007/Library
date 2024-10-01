@@ -1,7 +1,5 @@
 ﻿using System.Text;
 using System.Text.Json;
-using Biblioteka.BLL;
-using Biblioteka.Entities;
 using Biblioteka.PL.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,12 +8,10 @@ namespace Biblioteka.PL.Controllers;
 public class UserController : Controller
 {
     private readonly HttpClient _httpClient;
-    private readonly IUserService _userService;
 
-    public UserController(HttpClient httpClient, IUserService userService)
+    public UserController(IHttpClientFactory httpClientFactory)
     {
-        _httpClient = httpClient;
-        _userService = userService;
+        _httpClient = httpClientFactory.CreateClient("Base");
     }
 
     [HttpGet]
@@ -35,7 +31,7 @@ public class UserController : Controller
         var json = JsonSerializer.Serialize(model);
         var request = new StringContent(json, Encoding.UTF8, "application/json");
 
-        var response = await _httpClient.PostAsync("http://localhost:5194/User/auth", request);
+        var response = await _httpClient.PostAsync("/User/auth", request);
 
         if (response.IsSuccessStatusCode)
         {
@@ -55,32 +51,29 @@ public class UserController : Controller
         ModelState.AddModelError(string.Empty, "Неверный логин или пароль");
         return View(model);
     }
+    
     [HttpGet]
-    public ActionResult AddUser()
+    public IActionResult Register()
     {
         return View();
     }
     
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<ActionResult> AddUser(RegistorModel model)
+    public async Task<IActionResult> Register(RegisterModel model)
     {
         if (!ModelState.IsValid) return View(model);
-        var polzak = new Polzak
-        {
-            Username = model.Username,
-            Password = model.Password
-        };
 
-        try
+        var json = JsonSerializer.Serialize(model);
+        var request = new StringContent(json, Encoding.UTF8, "application/json");
+
+        var response = await _httpClient.PostAsync("/User/reg", request);
+
+        if (response.IsSuccessStatusCode)
         {
-            await _userService.AddUserAsync(polzak);
             return RedirectToAction("Login");
         }
-        catch (InvalidOperationException ex)
-        {
-            ModelState.AddModelError("", ex.Message);
-        }
+        
         return View(model);
     }
 }

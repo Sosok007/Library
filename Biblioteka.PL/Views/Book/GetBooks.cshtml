@@ -1,0 +1,45 @@
+﻿@model IEnumerable<BookViewModel>
+
+@{
+    ViewBag.Title = "Книги";
+    Layout = "_Layout";
+}
+
+<div class="container">
+    <div class="row">
+        @foreach (var book in Model)
+        {
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="card h-100">
+                    @* <img class="card-img-top" src="@car.Url" alt="@car.Model"/> *@
+                    <div class="card-body container">
+                        <div>
+                            <h4 class="card-title">@book.Name @DateOnly.Parse(book.Created!.Value.ToString("d"))</h4>
+                            <p class="card-text">@book.City</p>
+                        </div>
+                        <div>
+                            <a asp-action="" class="btn btn-primary">Перейти к описанию</a>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <small class="text-muted">@book.ISBN @book.Publisher </small>
+                    </div>
+                </div>
+            </div>
+        }
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="card h-100 shadow-sm">
+                <!-- Карточка с заголовком и описанием -->
+                <div class="card-body d-flex flex-column justify-content-between">
+                    <h5 class="card-title">Добавить книгу</h5>
+                    <p class="card-text">Заполните форму для добавления новой книги в библиотеку.</p>
+                </div>
+        
+                <!-- Кнопка внизу карточки -->
+                <div class="card-footer text-center">
+                    <a asp-action="AddBook" class="btn btn-primary btn-lg w-100">Добавить книгу</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

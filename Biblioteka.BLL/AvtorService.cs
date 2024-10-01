@@ -55,4 +55,9 @@ public class AvtorService : IAvtorService
             throw;
         }
     }
+    
+    public async Task<IReadOnlyCollection<Avtor>> GetAuthorsByIdsAsync(IEnumerable<Guid> ids)
+    {
+        return await _avtorRepository.GetAvtorsByIdsAsync(ids);
+    }
 }

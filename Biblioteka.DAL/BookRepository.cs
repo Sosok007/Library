@@ -14,7 +14,9 @@ public class BookRepository : IBookRepository
 
     public async Task<Book?> GetBookByIdAsync(Guid id)
     {
-        return await _context.Books.FirstOrDefaultAsync(x => x.Id == id);
+        return await _context.Books
+            .Include(x => x.Avtors)
+            .FirstOrDefaultAsync(x => x.Id == id);
     }
 
     public async Task<Guid?> InsertBookAsync(Book newBook)
@@ -25,34 +27,40 @@ public class BookRepository : IBookRepository
         }
         await _context.Books.AddAsync(newBook);
         await _context.SaveChangesAsync();
-        return  newBook.Id;
+        return newBook.Id;
     }
     public async Task DeleteBookAsync(Guid bookId)
     {
-        var book = await _context.Books.FindAsync(bookId);
+        var book = await _context.Books.FirstOrDefaultAsync(x => x.Id == bookId);
         if (book == null)
         {
-            
+            return;
         }
         _context.Books.Remove(book);
         await _context.SaveChangesAsync();
     }
     public async Task UpdateBookAsync(Guid bookId, Book updatedBook)
     {
-        var book = await _context.Books.FindAsync(bookId);
+        var book = await _context.Books
+            .Include(x => x.Avtors)
+            .FirstOrDefaultAsync(x => x.Id == bookId);
         if (book == null)
             return;
+        
         book.Id = updatedBook.Id;
-        book.Avtors = updatedBook.Avtors;
+        book.Avtors.UpdateCollection(updatedBook.Avtors, avtor => avtor.Id);
         book.Name = updatedBook.Name;
         book.ISBN = updatedBook.ISBN;
         book.Created = updatedBook.Created;
         book.City = updatedBook.City;
+        book.Publisher = updatedBook.Publisher;
         await _context.SaveChangesAsync();
     }
 
     public async Task<IReadOnlyCollection<Book>> GetBooksAsync()
     {
-        return await _context.Books.ToListAsync();
+        return await _context.Books
+            .Include(x => x.Avtors)
+            .ToListAsync();
     }
 }  

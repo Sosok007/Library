@@ -1,0 +1,47 @@
+﻿@model BookViewModel
+
+@{
+    ViewBag.Title = "Добавление книги";
+    Layout = "_Layout";
+}
+
+<form asp-action="AddBook" method="post" class="p-4 border rounded shadow-sm bg-light">
+    <div class="mb-3">
+        <label asp-for="Name" class="form-label">Название книги</label>
+        <input type="text" class="form-control" asp-for="Name" placeholder="Введите название книги" />
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="City" class="form-label">Город</label>
+        <input type="text" class="form-control" asp-for="City" placeholder="Введите город" />
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Created" class="form-label">Дата издания</label>
+        <input type="date" class="form-control" asp-for="Created" />
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Publisher" class="form-label">Издательство</label>
+        <input type="text" class="form-control" asp-for="Publisher" placeholder="Введите издательство" />
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="ISBN" class="form-label">ISBN</label>
+        <input type="text" class="form-control" asp-for="ISBN" placeholder="Введите ISBN" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Авторы</label>
+        <select asp-for="SelectedAuthorIds" class="form-control" multiple>
+            @foreach (var author in Model.Authors)
+            {
+                <option value="@author.Id">@author.Lastname @author.Firstname @author.Patronymic</option> // Отображаем имя автора
+            }
+        </select>
+        <small class="form-text text-muted">Выберите одного или нескольких авторов</small>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Добавить книгу</button>
+</form>
+
